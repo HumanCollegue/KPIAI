@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+frontend/dist/
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Claude Code local config
+.claude/
+
+# Uploads / data
+backend/uploads/
+*.xlsx
+*.xls
+
+# MVP data files (PDFs handled separately during deployment)
+MVP data files/
+*.pdf

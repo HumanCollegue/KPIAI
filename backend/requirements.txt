@@ -1,0 +1,30 @@
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Anthropic SDK
+anthropic==0.34.2
+
+# PDF / document parsing
+pdfplumber==0.11.4
+pypdf==4.3.1
+
+# Data handling
+pandas==2.2.3
+openpyxl==3.1.5
+
+# Validation & settings
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-multipart==0.0.9
+
+# Environment
+python-dotenv==1.0.1
+
+# HTTP client
+httpx==0.27.2
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+httpx==0.27.2
