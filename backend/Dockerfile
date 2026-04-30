@@ -6,7 +6,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
-COPY MVP data files/ /app/pdfs/
+COPY ["MVP data files/", "/app/pdfs/"]
 
 RUN mkdir -p data
 

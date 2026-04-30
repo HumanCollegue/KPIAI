@@ -36,3 +36,5 @@ backend/uploads/
 # MVP data files (PDFs handled separately during deployment)
 MVP data files/
 *.pdf
+!MVP data files/
+!MVP data files/**
