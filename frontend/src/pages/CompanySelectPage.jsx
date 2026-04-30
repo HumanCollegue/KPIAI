@@ -164,7 +164,7 @@ export default function CompanySelectPage() {
           <div className="page-title">Select a Company</div>
           <div className="page-subtitle">
             {companies.length > 0
-              ? "Choose one of the following companies from below to assess recent performance"
+              ? `Choose from ${companies.length} companies below to assess recent performance`
               : "Loading company list…"}
           </div>
         </div>
