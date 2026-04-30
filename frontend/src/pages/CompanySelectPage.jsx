@@ -135,7 +135,7 @@ export default function CompanySelectPage() {
         <div className="overlay">
           <div className="overlay__box">
             <div className="spinner" />
-            <div className="overlay__title">Analysing financial statements…</div>
+            <div className="overlay__title">Analyzing financial statements…</div>
             <div className="overlay__sub">{activeCompany.display_name}</div>
           </div>
         </div>
