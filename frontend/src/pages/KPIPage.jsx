@@ -235,9 +235,6 @@ export default function KPIPage() {
                   </span>
                   <div className="kpi-toggle__name">{kpi.display_name}</div>
                   <div className="kpi-toggle__formula">{kpi.formula}</div>
-                  {kpi.requires_prior_year && (
-                    <span className="kpi-toggle__tag">Requires prior year</span>
-                  )}
                 </button>
               ))}
             </div>
