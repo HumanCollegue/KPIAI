@@ -22,7 +22,6 @@ const SECTIONS = [
     fields: [
       "revenue",
       "cost_of_goods_sold",
-      "gross_profit",
       "operating_income",
       "operating_expenses",
       "interest_expense",
@@ -45,7 +44,6 @@ const FIELD_LABELS = {
   total_equity:        "Total Equity",
   revenue:             "Revenue",
   cost_of_goods_sold:  "Cost of Goods Sold",
-  gross_profit:        "Gross Profit",
   operating_income:    "Operating Income",
   operating_expenses:  "Operating Expenses",
   interest_expense:    "Interest Expense",
@@ -421,7 +419,7 @@ export default function TriagePage() {
                         )}
                       </th>
                       <th style={{ width: "35%" }}>Status</th>
-                      <th style={{ width: "15%" }}>Verification</th>
+                      <th className="col-verify" style={{ width: "15%" }}>Verification</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -545,7 +543,7 @@ export default function TriagePage() {
                             </td>
 
                             {/* Verification */}
-                            <td>
+                            <td className="col-verify">
                               {status === "needs_review" ? (
                                 <input
                                   type="checkbox"

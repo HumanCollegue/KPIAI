@@ -649,7 +649,8 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.triage-table th.col-num { text-align: left; }
+.triage-table th.col-num    { text-align: left; }
+.triage-table .col-verify   { text-align: center; }
 
 .triage-table td {
   padding: 10px 16px;

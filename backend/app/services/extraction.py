@@ -75,7 +75,6 @@ def _placeholder_response(company_filename: str) -> dict:
         "income_statement": {
             "revenue": stub,
             "cost_of_goods_sold": stub,
-            "gross_profit": stub,
             "operating_income": stub,
             "operating_expenses": stub,
             "interest_expense": stub,
@@ -205,7 +204,6 @@ _EXTRACTION_TOOL: dict = {
                 "properties": {
                     "revenue":            _LINE_ITEM_SCHEMA,
                     "cost_of_goods_sold": _LINE_ITEM_SCHEMA,
-                    "gross_profit":       _LINE_ITEM_SCHEMA,
                     "operating_income":   _LINE_ITEM_SCHEMA,
                     "operating_expenses": _LINE_ITEM_SCHEMA,
                     "interest_expense":   _LINE_ITEM_SCHEMA,
@@ -214,7 +212,6 @@ _EXTRACTION_TOOL: dict = {
                 "required": [
                     "revenue",
                     "cost_of_goods_sold",
-                    "gross_profit",
                     "operating_income",
                     "operating_expenses",
                     "interest_expense",
@@ -270,11 +267,10 @@ ACCEPTED LABEL VARIATIONS
 - Revenue           : Net Revenue, Net Sales, Total Revenue, Sales, Revenues
 - COGS              : Cost of Sales, Cost of Goods Sold, Cost of Products Sold,
                       Cost of Merchandise Sold, Direct Costs
-- Gross Profit      : Gross Margin (dollar amount only, not a %)
 - Operating Income  : Operating Earnings, Income from Operations, Profit from Operations,
                       Operating Profit (do NOT use EBITDA unless it is the only figure)
 - Operating Expenses: Total Operating Expenses; if not a single line, sum all operating
-                      cost lines below Gross Profit and above Operating Income
+                      cost lines above Operating Income
 - Total Debt        : Sum of (Long-term Debt + Current portion of long-term debt +
                       Short-term borrowings / bank indebtedness). If only one long-term
                       debt line exists, use it. Flag if you had to sum sub-items.
@@ -297,7 +293,6 @@ Flag (status = "flagged") if ANY of the following apply — be specific in flag_
 - Revenue, Total Assets, or Total Equity is negative                   → note unexpected sign
 - The prior_year_value is null for any item that requires a YoY figure → "Prior year value not found"
 - The reporting unit appears mixed or inconsistent across statements    → describe the mismatch
-- Gross Profit cannot be reconciled with Revenue minus COGS (>1% diff) → note the gap
 
 Always set flag_reason to null (not an empty string) when status is "clean".\
 """
@@ -330,9 +325,8 @@ def run_triage(company_filename: str) -> dict:
           - meta            : company name, fiscal year end, currency, unit, source
           - balance_sheet   : current_assets, inventory, current_liabilities,
                               total_assets, total_debt, total_equity
-          - income_statement: revenue, cost_of_goods_sold, gross_profit,
-                              operating_income, operating_expenses,
-                              interest_expense, net_income
+          - income_statement: revenue, cost_of_goods_sold, operating_income,
+                              operating_expenses, interest_expense, net_income
           - cash_flow       : operating_cash_flow, total_debt_service
 
         Each line item is a dict with:
