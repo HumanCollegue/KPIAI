@@ -111,6 +111,14 @@ export default function TriagePage() {
     }));
   }, []);
 
+  const toggleAccepted = useCallback((section, field) => {
+    const key = `${section}.${field}`;
+    setOverrides((prev) => ({
+      ...prev,
+      [key]: { ...(prev[key] || {}), accepted: true },
+    }));
+  }, []);
+
   const toggleExpand = useCallback((key) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
@@ -163,7 +171,8 @@ export default function TriagePage() {
       return ov?.verified ? "verified" : "complete";
     }
 
-    // flagged item — transitions to manually_adjusted as soon as any value entered
+    // flagged item — accepted, or transitions to manually_adjusted as soon as any value entered
+    if (ov?.accepted) return "accepted";
     const hasValue =
       (ov?.current !== undefined && ov.current !== "") ||
       (ov?.prior   !== undefined && ov.prior   !== "");
@@ -196,7 +205,8 @@ export default function TriagePage() {
         const item = extraction[key]?.[field];
         if (item?.status === "flagged") {
           total++;
-          if (getStatus(key, field) === "manually_adjusted") resolved++;
+          const s = getStatus(key, field);
+          if (s === "manually_adjusted" || s === "accepted") resolved++;
         }
       })
     );
@@ -209,13 +219,10 @@ export default function TriagePage() {
     0
   );
 
-  // Items not yet in a terminal state (manually_adjusted or verified)
+  // Items that block proceeding (only needs_review)
   const unresolvedCount = SECTIONS.reduce(
     (n, { key, fields }) =>
-      n + fields.filter((f) => {
-        const s = getStatus(key, f);
-        return s !== "manually_adjusted" && s !== "verified";
-      }).length,
+      n + fields.filter((f) => getStatus(key, f) === "needs_review").length,
     0
   );
 
@@ -241,7 +248,8 @@ export default function TriagePage() {
             if (!isNaN(v)) item.prior_year_value = v;
           }
           item.status = "clean";
-        } else if (status === "verified" || status === "complete") {
+        } else if (status === "accepted" || status === "verified" || status === "complete") {
+          // accepted: use Claude's original extracted value as-is
           item.status = "clean";
         }
         // needs_review stays flagged → blocks dependent KPIs
@@ -266,6 +274,7 @@ export default function TriagePage() {
   const StatusBadge = ({ status }) => {
     const map = {
       needs_review:      { cls: "badge--needs-review",      label: "Needs Review"      },
+      accepted:          { cls: "badge--accepted",           label: "Accepted"          },
       complete:          { cls: "badge--complete",           label: "Complete"          },
       manually_adjusted: { cls: "badge--manually-adjusted",  label: "Manually Adjusted" },
       verified:          { cls: "badge--verified",           label: "✓ Verified"        },
@@ -425,6 +434,7 @@ export default function TriagePage() {
                       const rowCls = [
                         "triage-row",
                         status === "needs_review"      ? "triage-row--needs-review"      : "",
+                        status === "accepted"          ? "triage-row--accepted"          : "",
                         status === "manually_adjusted" ? "triage-row--manually-adjusted" : "",
                         status === "verified"          ? "triage-row--verified"          : "",
                       ].filter(Boolean).join(" ");
@@ -529,18 +539,25 @@ export default function TriagePage() {
                             {/* Status */}
                             <td>
                               <StatusBadge status={status} />
-                              {status === "needs_review" && item.flag_reason && (
+                              {(status === "needs_review" || status === "accepted") && item.flag_reason && (
                                 <div className="flag-reason-text">{item.flag_reason}</div>
                               )}
                             </td>
 
                             {/* Verification */}
                             <td>
-                              {status !== "needs_review" && (
+                              {status === "needs_review" ? (
                                 <input
                                   type="checkbox"
                                   className="verify-checkbox"
-                                  checked={status === "verified" || status === "manually_adjusted"}
+                                  checked={false}
+                                  onChange={() => toggleAccepted(section, field)}
+                                />
+                              ) : (
+                                <input
+                                  type="checkbox"
+                                  className="verify-checkbox"
+                                  checked={status === "verified" || status === "manually_adjusted" || status === "accepted"}
                                   disabled={status !== "complete"}
                                   onChange={status === "complete" ? () => toggleVerified(section, field) : undefined}
                                 />
@@ -588,20 +605,15 @@ export default function TriagePage() {
       {/* Sticky footer */}
       <div className="page-actions">
         <div className="page-actions__left">
-          {flagStats.remaining > 0 ? (
+          {unresolvedCount > 0 ? (
             <span style={{ color: "var(--warn)" }}>
-              {flagStats.remaining} item{flagStats.remaining !== 1 ? "s" : ""} need
-              review — resolve before proceeding
+              {unresolvedCount} item{unresolvedCount !== 1 ? "s" : ""} need
+              review — accept or adjust before proceeding
             </span>
-          ) : completeCount > 0 ? (
-            <span style={{ color: "var(--warn)" }}>
-              {completeCount} item{completeCount !== 1 ? "s" : ""} need
-              verification — check the boxes before proceeding
-            </span>
-          ) : flagStats.total > 0 ? (
-            <span style={{ color: "var(--success)" }}>All items resolved and verified</span>
           ) : (
-            <span style={{ color: "var(--success)" }}>All {totalItems} items verified</span>
+            <span style={{ color: "var(--success)" }}>
+              {flagStats.total > 0 ? "All flagged items resolved" : `All ${totalItems} items ready`} — ready to proceed
+            </span>
           )}
         </div>
         <button
