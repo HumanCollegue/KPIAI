@@ -217,10 +217,13 @@ export default function TriagePage() {
     0
   );
 
-  // Items that block proceeding (only needs_review)
+  // Items that block proceeding (needs_review or complete-but-unverified)
   const unresolvedCount = SECTIONS.reduce(
     (n, { key, fields }) =>
-      n + fields.filter((f) => getStatus(key, f) === "needs_review").length,
+      n + fields.filter((f) => {
+        const s = getStatus(key, f);
+        return s === "needs_review" || s === "complete";
+      }).length,
     0
   );
 
@@ -605,8 +608,9 @@ export default function TriagePage() {
         <div className="page-actions__left">
           {unresolvedCount > 0 ? (
             <span style={{ color: "var(--warn)" }}>
-              {unresolvedCount} item{unresolvedCount !== 1 ? "s" : ""} need
-              review — accept or adjust before proceeding
+              {completeCount > 0 && flagStats.remaining === 0
+                ? `${completeCount} item${completeCount !== 1 ? "s" : ""} need verification — check the boxes before proceeding`
+                : `${unresolvedCount} item${unresolvedCount !== 1 ? "s" : ""} need${unresolvedCount === 1 ? "s" : ""} attention — resolve all flagged items and verify before proceeding`}
             </span>
           ) : (
             <span style={{ color: "var(--success)" }}>

@@ -890,7 +890,7 @@ body {
 
 /* Triage status badges */
 .badge--needs-review      { background: var(--warn-bg);    color: var(--warn);     border: 1px solid var(--warn-b);     }
-.badge--accepted          { background: #FEF3C7;           color: #92400E;         border: 1px solid #FCD34D;           }
+.badge--accepted          { background: #E0F2FE;           color: #0891B2;         border: 1px solid #7DD3FC;           }
 .badge--complete          { background: var(--success-bg); color: var(--success);  border: 1px solid var(--success-b);  }
 .badge--manually-adjusted { background: var(--primary-bg); color: var(--primary);  border: 1px solid var(--primary-b);  }
 .badge--verified          { background: #ECFDF5;           color: #065F46;         border: 1px solid #6EE7B7;           }
