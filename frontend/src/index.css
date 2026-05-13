@@ -1075,42 +1075,35 @@ body {
 }
 
 /* ── Tutorial overlay ────────────────────────────────────────────────────────── */
+/* Each tutorial element uses position:fixed with its own high z-index so there
+   is no stacking-context dependency on a wrapper element. */
 
-/* Outer container — fixed, covers full viewport, pointer-events block clicks */
-.tutorial-root {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-}
-
-/* Dark semi-transparent backdrop */
-.tutorial-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.62);
-  pointer-events: all;
-}
-
-/* Spotlight cutout — the large box-shadow IS the overlay; the div itself is transparent */
-.tutorial-spotlight {
-  position: fixed;
-  border-radius: 8px;
-  box-shadow: 0 0 0 9999px rgba(17, 24, 39, 0.62);
-  pointer-events: none;
-  z-index: 1; /* above backdrop within stacking context */
-}
-
-/* White tooltip card */
+/* White tooltip card — z-index set via inline style (9002) */
 .tutorial-card {
-  position: fixed; /* overridden by inline style */
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 24px 24px 20px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.20), 0 2px 8px rgba(0, 0, 0, 0.08);
-  z-index: 2; /* above spotlight within stacking context */
   font-family: var(--font-body);
   pointer-events: all;
+  position: relative; /* for X button absolute positioning */
 }
+
+/* X close button */
+.tutorial-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-3);
+  padding: 0 2px;
+  transition: color 0.12s;
+}
+.tutorial-close:hover { color: var(--text); }
 
 .tutorial-card__meta {
   display: flex;

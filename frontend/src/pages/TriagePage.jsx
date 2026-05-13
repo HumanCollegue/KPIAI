@@ -421,7 +421,7 @@ export default function TriagePage() {
                           <div className="col-unit">{normalizeUnit(meta.reporting_unit)}</div>
                         )}
                       </th>
-                      <th style={{ width: "35%" }}>Status</th>
+                      <th style={{ width: "35%" }} data-tutorial="status-col">Status</th>
                       <th className="col-verify" style={{ width: "15%" }}>Verification</th>
                     </tr>
                   </thead>

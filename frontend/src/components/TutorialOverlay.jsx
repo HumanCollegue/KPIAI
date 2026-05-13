@@ -2,10 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 
 // ── Step definitions ─────────────────────────────────────────────────────────
-//   page:     route pathname where this step appears
-//   selector: CSS selector for the spotlight target (null = centered card)
-//   content:  tooltip body text
-//   position: "center" | "bottom" | "top" | "right"
 
 const STEPS = [
   {
@@ -31,7 +27,7 @@ const STEPS = [
   },
   {
     page: "/triage",
-    selector: ".triage-table th:nth-child(4)",
+    selector: "[data-tutorial='status-col']",
     content:
       "Complete means the value was clearly labelled in the document and only needs a quick confirmation. Needs Review means Claude made an assumption or could not find a standard label — the detailed explanation tells you exactly what was found and why, so you can make an informed decision.",
     position: "bottom",
@@ -72,56 +68,52 @@ const TOOLTIP_W = 380;
 const GAP       = 16;
 const MARGIN    = 20;
 
+function clampLeft(x) {
+  return Math.max(MARGIN, Math.min(x, window.innerWidth - TOOLTIP_W - MARGIN));
+}
+
+// Returns inline style object for the tooltip card.
+// Falls back to centered whenever rect is missing or has no area.
 function getTooltipStyle(rect, position) {
-  if (!rect || position === "center") {
-    return {
-      position: "fixed",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      width: TOOLTIP_W,
-      maxWidth: `calc(100vw - ${MARGIN * 2}px)`,
-    };
+  const centered = {
+    position: "fixed",
+    top:  "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: TOOLTIP_W,
+    maxWidth: `calc(100vw - ${MARGIN * 2}px)`,
+    zIndex: 9002,
+  };
+
+  if (!rect || rect.width === 0 || rect.height === 0 || position === "center") {
+    return centered;
   }
 
-  const clampLeft = (x) =>
-    Math.max(MARGIN, Math.min(x, window.innerWidth - TOOLTIP_W - MARGIN));
-  const centredLeft = clampLeft(rect.left + rect.width / 2 - TOOLTIP_W / 2);
+  const left = clampLeft(rect.left + rect.width / 2 - TOOLTIP_W / 2);
 
   switch (position) {
-    case "bottom":
-      return {
-        position: "fixed",
-        top: rect.bottom + GAP,
-        left: centredLeft,
-        width: TOOLTIP_W,
-        maxWidth: `calc(100vw - ${MARGIN * 2}px)`,
-      };
-    case "top":
-      return {
-        position: "fixed",
-        bottom: window.innerHeight - rect.top + GAP,
-        left: centredLeft,
-        width: TOOLTIP_W,
-        maxWidth: `calc(100vw - ${MARGIN * 2}px)`,
-      };
-    case "right":
-      return {
-        position: "fixed",
-        top: Math.max(MARGIN, rect.top + rect.height / 2 - 90),
-        left: Math.min(rect.right + GAP, window.innerWidth - TOOLTIP_W - MARGIN),
-        width: TOOLTIP_W,
-        maxWidth: `calc(100vw - ${rect.right + GAP + MARGIN}px)`,
-      };
+    case "bottom": {
+      const top = rect.bottom + GAP;
+      // If card would go off-screen below, flip to top instead
+      if (top + 200 > window.innerHeight) {
+        const bottom = window.innerHeight - rect.top + GAP;
+        if (bottom < 0) return centered;
+        return { position: "fixed", bottom, left, width: TOOLTIP_W, maxWidth: `calc(100vw - ${MARGIN * 2}px)`, zIndex: 9002 };
+      }
+      return { position: "fixed", top, left, width: TOOLTIP_W, maxWidth: `calc(100vw - ${MARGIN * 2}px)`, zIndex: 9002 };
+    }
+    case "top": {
+      const bottom = window.innerHeight - rect.top + GAP;
+      if (bottom < 0 || bottom > window.innerHeight - 60) return centered;
+      return { position: "fixed", bottom, left, width: TOOLTIP_W, maxWidth: `calc(100vw - ${MARGIN * 2}px)`, zIndex: 9002 };
+    }
+    case "right": {
+      const rightLeft = Math.min(rect.right + GAP, window.innerWidth - TOOLTIP_W - MARGIN);
+      const top = Math.max(MARGIN, rect.top + rect.height / 2 - 90);
+      return { position: "fixed", top, left: rightLeft, width: TOOLTIP_W, maxWidth: `calc(100vw - ${rect.right + GAP + MARGIN}px)`, zIndex: 9002 };
+    }
     default:
-      return {
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: TOOLTIP_W,
-        maxWidth: `calc(100vw - ${MARGIN * 2}px)`,
-      };
+      return centered;
   }
 }
 
@@ -141,7 +133,7 @@ export default function TutorialOverlay() {
   const step = stepIdx >= 0 && stepIdx < STEPS.length ? STEPS[stepIdx] : null;
   const onCorrectPage = step?.page === location.pathname;
 
-  // Measure target element after render (small delay to let DOM settle)
+  // Measure target element — small delay lets React finish painting
   useEffect(() => {
     if (!onCorrectPage || !step?.selector) {
       setSpotRect(null);
@@ -159,6 +151,14 @@ export default function TutorialOverlay() {
     localStorage.removeItem("kpiai_tutorial_step");
     setStepIdx(-1);
   }, []);
+
+  // Escape key closes the tutorial
+  useEffect(() => {
+    if (!onCorrectPage) return;
+    const handler = (e) => { if (e.key === "Escape") dismiss(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onCorrectPage, dismiss]);
 
   const goNext = useCallback(() => {
     const next = stepIdx + 1;
@@ -182,38 +182,69 @@ export default function TutorialOverlay() {
 
   const isFirst = stepIdx === 0;
   const isLast  = stepIdx === STEPS.length - 1;
-  const tooltipStyle = getTooltipStyle(spotRect, step.position);
+
+  // Use a valid rect only if it has real area (guards against hidden/zero-sized elements)
+  const validRect = spotRect && spotRect.width > 0 && spotRect.height > 0 ? spotRect : null;
+  const tooltipStyle = getTooltipStyle(validRect, step.position);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  // Each element has its own position:fixed and a very high z-index so there
+  // is NO stacking-context dependency on a wrapper element.
 
   return (
-    <div className="tutorial-root">
-      {/* Dark backdrop — fills when no spotlight, otherwise covered by box-shadow */}
-      <div className="tutorial-backdrop" />
-
-      {/* Spotlight cutout via large box-shadow */}
-      {spotRect && (
+    <>
+      {/* Dark overlay — spotlight if we have a target, full backdrop otherwise */}
+      {validRect ? (
         <div
-          className="tutorial-spotlight"
           style={{
-            top:    spotRect.top    - 6,
-            left:   spotRect.left   - 6,
-            width:  spotRect.width  + 12,
-            height: spotRect.height + 12,
+            position: "fixed",
+            zIndex: 9000,
+            top:    validRect.top    - 6,
+            left:   validRect.left   - 6,
+            width:  validRect.width  + 12,
+            height: validRect.height + 12,
+            borderRadius: 8,
+            // The large box-shadow IS the dark overlay; the div itself stays transparent
+            boxShadow: "0 0 0 9999px rgba(17,24,39,0.62)",
+            pointerEvents: "none",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            position: "fixed",
+            zIndex: 9000,
+            inset: 0,
+            background: "rgba(17,24,39,0.62)",
+            pointerEvents: "all",
           }}
         />
       )}
 
-      {/* Tooltip card */}
+      {/* Tooltip card — always rendered, always above the overlay */}
       <div className="tutorial-card" style={tooltipStyle}>
+        {/* X close button */}
+        <button
+          className="tutorial-close"
+          onClick={dismiss}
+          title="Close tutorial (Esc)"
+          aria-label="Close tutorial"
+        >
+          ×
+        </button>
+
+        {/* Step counter + pip row */}
         <div className="tutorial-card__meta">
           <span className="tutorial-card__step">
             Step {stepIdx + 1} of {STEPS.length}
           </span>
-          {/* Step pip indicators */}
           <div className="tutorial-pips">
             {STEPS.map((_, i) => (
               <span
                 key={i}
-                className={`tutorial-pip${i === stepIdx ? " tutorial-pip--active" : i < stepIdx ? " tutorial-pip--done" : ""}`}
+                className={`tutorial-pip${
+                  i === stepIdx ? " tutorial-pip--active" : i < stepIdx ? " tutorial-pip--done" : ""
+                }`}
               />
             ))}
           </div>
@@ -238,6 +269,6 @@ export default function TutorialOverlay() {
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
