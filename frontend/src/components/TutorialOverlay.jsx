@@ -31,13 +31,13 @@ const STEPS = [
     page: "/triage",
     selector: null,
     content:
-      "Complete means the value was clearly labelled in the document and only needs a quick confirmation. Needs Review means Claude made an assumption or could not find a standard label — the detailed explanation tells you exactly what was found and why, so you can make an informed decision.",
+      "Complete means the value was clearly labelled in the document and only needs a quick confirmation. Needs Review means the platform made an assumption or could not find a standard label. When a line item Needs Review a detailed explanation is provided telling you exactly what was found and why, so you can make an informed decision.",
   },
   {
     page: "/triage",
     selector: null,
     content:
-      "Every value is editable. Click any number to type a correction. The value will be used in all KPI calculations. You can also accept Claude's assumption as-is using the checkbox in the Verification column.",
+      "Every value is editable. Click on any number to make a manual adjustment. This adjusted value will be used in all KPI calculations going forward. You can also accept the assumption as-is using the checkbox in the Verification column if you agree with the detailed explanation.",
   },
   {
     page: "/triage",
