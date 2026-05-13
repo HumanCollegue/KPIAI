@@ -1128,24 +1128,27 @@ body {
 /* X close button */
 .tutorial-close {
   position: absolute;
-  top: 12px;
-  right: 14px;
+  top: 10px;
+  right: 12px;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: 700;
   line-height: 1;
-  color: var(--text-3);
-  padding: 0 2px;
-  transition: color 0.12s;
+  color: #111827;
+  padding: 4px 6px;
+  transition: opacity 0.12s;
 }
-.tutorial-close:hover { color: var(--text); }
+.tutorial-close:hover { opacity: 0.6; }
 
 .tutorial-card__meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  /* leave room on the right so pips don't crowd the X button */
+  padding-right: 32px;
 }
 
 .tutorial-card__step {

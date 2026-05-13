@@ -238,11 +238,7 @@ export default function TutorialOverlay() {
 
         <div className="tutorial-card__actions">
           <div>
-            {isFirst ? (
-              <button className="tutorial-btn tutorial-btn--ghost" onClick={dismiss}>
-                Skip Tutorial
-              </button>
-            ) : (
+            {!isFirst && (
               <button className="tutorial-btn tutorial-btn--ghost" onClick={goPrev}>
                 ← Previous
               </button>
