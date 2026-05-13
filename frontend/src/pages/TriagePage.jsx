@@ -289,21 +289,23 @@ export default function TriagePage() {
   return (
     <>
       <nav className="navbar">
-        <span className="navbar__brand">KPI<span>-AI</span></span>
-        <div className="navbar__right">
-          <div className="nav-steps">
-            <div className="nav-step nav-step--done">
-              <span className="nav-step__num">✓</span> Select Company
-            </div>
-            <span className="nav-divider">›</span>
-            <div className="nav-step nav-step--active">
-              <span className="nav-step__num">2</span> Review & Verify
-            </div>
-            <span className="nav-divider">›</span>
-            <div className="nav-step">
-              <span className="nav-step__num">3</span> KPI Calculation
-            </div>
+        <div className="navbar__left">
+          <span className="navbar__brand">KPI<span>-AI</span></span>
+        </div>
+        <div className="nav-steps">
+          <div className="nav-step nav-step--done">
+            <span className="nav-step__num">✓</span> Select Company
           </div>
+          <span className="nav-divider">›</span>
+          <div className="nav-step nav-step--active">
+            <span className="nav-step__num">2</span> Review & Verify
+          </div>
+          <span className="nav-divider">›</span>
+          <div className="nav-step">
+            <span className="nav-step__num">3</span> KPI Calculation
+          </div>
+        </div>
+        <div className="navbar__right">
           <button
             className="navbar__tutorial-btn"
             onClick={() => {
@@ -313,7 +315,7 @@ export default function TriagePage() {
             }}
             title="Replay tutorial from the beginning"
           >
-            ? Tutorial
+            View Tutorial
           </button>
         </div>
       </nav>
