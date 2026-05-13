@@ -290,18 +290,31 @@ export default function TriagePage() {
     <>
       <nav className="navbar">
         <span className="navbar__brand">KPI<span>-AI</span></span>
-        <div className="nav-steps">
-          <div className="nav-step nav-step--done">
-            <span className="nav-step__num">✓</span> Select Company
+        <div className="navbar__right">
+          <div className="nav-steps">
+            <div className="nav-step nav-step--done">
+              <span className="nav-step__num">✓</span> Select Company
+            </div>
+            <span className="nav-divider">›</span>
+            <div className="nav-step nav-step--active">
+              <span className="nav-step__num">2</span> Review & Verify
+            </div>
+            <span className="nav-divider">›</span>
+            <div className="nav-step">
+              <span className="nav-step__num">3</span> KPI Calculation
+            </div>
           </div>
-          <span className="nav-divider">›</span>
-          <div className="nav-step nav-step--active">
-            <span className="nav-step__num">2</span> Review & Verify
-          </div>
-          <span className="nav-divider">›</span>
-          <div className="nav-step">
-            <span className="nav-step__num">3</span> KPI Calculation
-          </div>
+          <button
+            className="navbar__tutorial-btn"
+            onClick={() => {
+              localStorage.removeItem("kpiai_tutorial_done");
+              localStorage.removeItem("kpiai_tutorial_step");
+              window.location.href = "/";
+            }}
+            title="Replay tutorial from the beginning"
+          >
+            ? Tutorial
+          </button>
         </div>
       </nav>
 

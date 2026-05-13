@@ -82,6 +82,34 @@ body {
   font-weight: 400;
 }
 
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar__tutorial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--primary-b);
+  background: var(--primary-bg);
+  color: var(--primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.navbar__tutorial-btn:hover {
+  background: #E0E7FF;
+  border-color: var(--primary);
+}
+
 /* ── Step progress ───────────────────────────────────────────────────────────── */
 .nav-steps {
   display: flex;
@@ -1190,25 +1218,6 @@ body {
   color: var(--text);
 }
 
-/* ── Page footer ─────────────────────────────────────────────────────────────── */
-.page-footer {
-  margin-top: 40px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.page-footer__link {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-size: 12.5px;
-  color: var(--text-3);
-  padding: 0;
-  transition: color 0.15s;
-}
-.page-footer__link:hover { color: var(--primary); }
 
 /* ── Utilities ───────────────────────────────────────────────────────────────── */
 .text-muted { color: var(--text-2); }
