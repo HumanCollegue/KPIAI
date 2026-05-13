@@ -296,6 +296,20 @@ export default function CompanySelectPage() {
             </div>
           </div>
         ))}
+
+        {/* Page footer */}
+        <div className="page-footer">
+          <button
+            className="page-footer__link"
+            onClick={() => {
+              localStorage.removeItem("kpiai_tutorial_done");
+              localStorage.removeItem("kpiai_tutorial_step");
+              window.location.reload();
+            }}
+          >
+            Replay tutorial
+          </button>
+        </div>
       </div>
     </>
   );
